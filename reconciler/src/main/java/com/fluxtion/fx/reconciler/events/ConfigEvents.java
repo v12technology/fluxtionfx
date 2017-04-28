@@ -14,15 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.utils;
+package com.fluxtion.fx.reconciler.events;
 
-import com.fluxtion.api.node.SEPConfig;
+import com.fluxtion.fx.reconciler.helpers.ReportConfiguration;
 
 /**
- * Only required because maven plugin requires a config class, will be removed when plugin is updated.
- * 
+ *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  */
-public class EmptyConfig extends SEPConfig{
+public interface ConfigEvents {
+
+    public static final String REPORT_CONFIG = "com.fluxtion.fx.reconciler.publishResults.config";
+    
+    public static ConfigurationEvent<ReportConfiguration> reportConfig(ReportConfiguration config){
+        return new ConfigurationEvent<>(config, REPORT_CONFIG);
+    }
     
 }

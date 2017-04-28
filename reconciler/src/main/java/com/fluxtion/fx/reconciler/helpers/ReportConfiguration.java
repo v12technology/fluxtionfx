@@ -14,15 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.utils;
+package com.fluxtion.fx.reconciler.helpers;
 
-import com.fluxtion.api.node.SEPConfig;
+import java.util.HashMap;
 
 /**
- * Only required because maven plugin requires a config class, will be removed when plugin is updated.
- * 
+ *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  */
-public class EmptyConfig extends SEPConfig{
+public class ReportConfiguration {
+  
+    public String reportDirectory;
+    public String prefix;
+    public String suffix;
+    public HashMap map = new HashMap();
     
+    /**
+     * returns supplied default dir if reportDirectory is null
+     * 
+     * @param defaultDir
+     * @return 
+     */
+    public String getReportDirectory(String defaultDir){
+        return reportDirectory==null?defaultDir:reportDirectory;
+    }
 }

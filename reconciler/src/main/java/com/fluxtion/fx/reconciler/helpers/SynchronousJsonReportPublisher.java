@@ -107,6 +107,14 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
     }
 
     @Override
+    public void conifgure(ReportConfiguration config) {
+        reportDirectory = new File(config.reportDirectory);
+        reportDirectory.mkdirs();
+    }
+
+    
+    
+    @Override
     public void init() {
         sb = new StringBuilder(STRING_BUFFER_SIZE);
         buffer = ByteBuffer.allocate(PAGE_SIZE);

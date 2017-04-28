@@ -14,15 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.utils;
+package com.fluxtion.fx.reconciler.events;
 
-import com.fluxtion.api.node.SEPConfig;
+import static com.fluxtion.fx.event.FxEventIdList.CONFIGURAION_EVENT;
+import com.fluxtion.runtime.event.Event;
 
 /**
- * Only required because maven plugin requires a config class, will be removed when plugin is updated.
- * 
+ *
  * @author Greg Higgins (greg.higgins@V12technology.com)
+ * @param <T>
  */
-public class EmptyConfig extends SEPConfig{
-    
+public class ConfigurationEvent<T> extends Event {
+
+    public static final int ID = CONFIGURAION_EVENT;
+    private T configuration;
+
+    public ConfigurationEvent(T configuration, String confgiKey) {
+        super(CONFIGURAION_EVENT, confgiKey);
+        this.configuration = configuration;
+    }
+
+    public T getConfiguration() {
+        return configuration;
+    }
+
 }

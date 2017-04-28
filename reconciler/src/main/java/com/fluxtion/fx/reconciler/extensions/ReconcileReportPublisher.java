@@ -17,6 +17,7 @@
 package com.fluxtion.fx.reconciler.extensions;
 
 import com.fluxtion.fx.reconciler.helpers.ReconcileCacheQuery;
+import com.fluxtion.fx.reconciler.helpers.ReportConfiguration;
 import com.fluxtion.fx.reconciler.nodes.ReconcileCache;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 
@@ -44,6 +45,8 @@ public interface ReconcileReportPublisher extends Lifecycle {
      */
     void publishReport(ReconcileCacheQuery reconcileCache, String reconcilerId);
 
+    default void conifgure(ReportConfiguration config){ }
+    
     @Override
     default void init() {
     }

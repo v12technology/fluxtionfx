@@ -26,9 +26,12 @@ import com.fluxtion.api.annotations.OnParentUpdate;
 import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.node.biascheck.TimedNotifier;
+import com.fluxtion.fx.reconciler.events.ConfigEvents;
+import com.fluxtion.fx.reconciler.events.ConfigurationEvent;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
 import static com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher.RESULT_PUBLISHER;
 import com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher;
+import com.fluxtion.fx.reconciler.helpers.ReportConfiguration;
 
 /**
  * Publishes reports of the current reconcile status by delegating to a
@@ -83,6 +86,14 @@ public class ReportGenerator {
         this.publisher.init();
     }
 
+    @EventHandler(filterString = ConfigEvents.REPORT_CONFIG, propogate = false)
+    public void configurePublisher(ConfigurationEvent<ReportConfiguration> configEvent){
+        if (publisher != null) {
+            publisher.conifgure(configEvent.getConfiguration());
+        }
+    }
+    
+    
     @EventHandler(filterString = ControlSignals.PUBLISH_REPORT, propogate = false)
     public void publishResults(ControlSignal publishSignal) {
         if (publisher != null) {
