@@ -82,7 +82,8 @@
                             <configClass>com.fluxtion.fx.reconciler.utils.EmptyConfig</configClass>
                             <nodeNamingClass>com.fluxtion.fx.reconciler.helpers.ReconcilerNameProducer</nodeNamingClass>
                             <yamlFactoryConfig>src/test/resources/config/reconciler_6.yml</yamlFactoryConfig>
-                            <logDebug>true</logDebug>
+                            <outputDirectory>${basedir}/target/generated-test-sources/java</outputDirectory>
+                            <!--<logDebug>true</logDebug>-->
                         </configuration>
                     </execution>
                 </executions>
