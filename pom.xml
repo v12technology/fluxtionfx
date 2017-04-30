@@ -23,6 +23,7 @@ obtained from V12 Technology Limited.
         <module>api</module>
     -->
         <module>reconciler</module>
+        <module>reconciler-webapp</module>
     </modules>
     
     <properties>
