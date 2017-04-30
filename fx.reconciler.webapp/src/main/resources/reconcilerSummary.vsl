@@ -1,0 +1,74 @@
+## Velocity Template.
+<html>
+<head>
+<style type="text/css">
+table.gridtable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.gridtable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.gridtable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+table.gridtable td.expired {
+	background-color: #d9caa9;
+	color: #cc5252;
+}
+</style>
+
+</head>
+<body>
+#if($reconcilerstatus)
+<h2>Reconciler status</h2>
+
+<table " class="gridtable" cellspacing="0" >
+  <tr>
+    <th>reconciler name</th>
+    <th>reconciled</th>
+    <th>reconciling</th>
+    <th>expired</th>
+  </tr>
+#foreach ( $status  in $reconcilerstatus)
+<tr>
+    <td><a href="reconcile-report/${status.id}">${status.id}</a></td>
+    <td  id="${status.id}-reconciled">${status.reconciled}</td>
+    <td  id="${status.id}-reconciling">${status.reconciling}</td>
+    <td class="expired" id="${status.id}-expired">${status.expired}</td>
+</tr>
+#end
+</table>
+#end
+
+</body>
+<script>
+
+var webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/live-stats/");
+webSocket.onmessage = function (msg) { updateChat(msg); };
+
+
+function updateChat(msg) {
+    var data = JSON.parse(msg.data);
+    document.getElementById(data.id+ "-expired" ).innerHTML =  data.expired;
+    document.getElementById(data.id+ "-reconciling" ).innerHTML =  data.reconciling;
+    document.getElementById(data.id+ "-reconciled" ).innerHTML =  data.reconciled;
+}
+
+
+
+</script>
+</html>
