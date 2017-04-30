@@ -1,42 +1,32 @@
-## Velocity Template.
+##Copyright (C) 2017 V12 Technology Limited
+##
+##This program is free software: you can redistribute it and/or modify
+##it under the terms of the GNU General Public License as published by
+##the Free Software Foundation, either version 3 of the License, or
+##(at your option) any later version.
+##
+##This program is distributed in the hope that it will be useful,
+##but WITHOUT ANY WARRANTY; without even the implied warranty of
+##MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##GNU General Public License for more details.
+##
+##You should have received a copy of the GNU General Public License
+##along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 <html>
 <head>
-<style type="text/css">
-table.gridtable {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
-}
-table.gridtable th {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
-}
-table.gridtable td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
-}
-
-table.gridtable td.expired {
-	background-color: #d9caa9;
-	color: #cc5252;
-}
-</style>
-
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
 #if($reconcilerstatus)
-<h2>Reconciler status</h2>
 
-<table " class="gridtable" cellspacing="0" >
+<div class="container">
+<h2>Reconciler status</h2>
+<table  class="table table-striped table-bordered table-hover table-condensed">
   <tr>
     <th>reconciler name</th>
     <th>reconciled</th>
@@ -48,27 +38,23 @@ table.gridtable td.expired {
     <td><a href="reconcile-report/${status.id}">${status.id}</a></td>
     <td  id="${status.id}-reconciled">${status.reconciled}</td>
     <td  id="${status.id}-reconciling">${status.reconciling}</td>
-    <td class="expired" id="${status.id}-expired">${status.expired}</td>
+    <td class="info" id="${status.id}-expired">${status.expired}</td>
 </tr>
 #end
 </table>
+</div>
 #end
 
 </body>
 <script>
-
 var webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/live-stats/");
-webSocket.onmessage = function (msg) { updateChat(msg); };
+webSocket.onmessage = function (msg) { updateStats(msg); };
 
-
-function updateChat(msg) {
+function updateStats(msg) {
     var data = JSON.parse(msg.data);
     document.getElementById(data.id+ "-expired" ).innerHTML =  data.expired;
     document.getElementById(data.id+ "-reconciling" ).innerHTML =  data.reconciling;
     document.getElementById(data.id+ "-reconciled" ).innerHTML =  data.reconciled;
 }
-
-
-
 </script>
 </html>

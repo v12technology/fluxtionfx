@@ -1,7 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2017 V12 Technology Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.fluxtion.fx.reconciler.webapp;
 
@@ -24,19 +35,16 @@ import org.json.JSONObject;
 @WebSocket
 public class StatsPusher {
 
-    private String sender, msg;
     private static final Queue<Session> SESSIONS = new ConcurrentLinkedQueue<>();
 
     @OnWebSocketConnect
     public void onConnect(Session user) throws Exception {
         SESSIONS.add(user);
-        System.out.println("new session connection:" + user);
     }
 
     @OnWebSocketClose
     public void onClose(Session user, int statusCode, String reason) {
         SESSIONS.remove(user);
-        System.out.println("closed session connection:" + user);
     }
     
     public static void publishStats(ReconcilerStatus status){
@@ -48,7 +56,6 @@ public class StatsPusher {
                         .put("reconciling", status.getReconciling())
                         ;
                 String s = String.valueOf(json);
-//                System.out.println("sending:" + s);
                 session.getRemote().sendString(s);
             } catch (IOException ex) {
                 Logger.getLogger(StatsPusher.class.getName()).log(Level.SEVERE, null, ex);
@@ -58,6 +65,6 @@ public class StatsPusher {
 
     @OnWebSocketMessage
     public void onMessage(Session user, String message) {
-
+        //for processiing control messages
     }
 }
