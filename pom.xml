@@ -24,6 +24,7 @@ obtained from V12 Technology Limited.
     -->
         <module>reconciler</module>
         <module>reconciler-webapp</module>
+        <module>ChronicleIntegration</module>
     </modules>
     
     <properties>
