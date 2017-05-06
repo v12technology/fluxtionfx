@@ -18,8 +18,10 @@
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+ <link rel="stylesheet" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
 #if($reconcilerstatus)
@@ -34,8 +36,8 @@
     <th>expired</th>
   </tr>
 #foreach ( $status  in $reconcilerstatus)
-<tr>
-    <td><a href="reconcile-report/${status.id}">${status.id}</a></td>
+<tr onclick="showRecords('${status.id}')">
+    <td >${status.id}</td>
     <td  id="${status.id}-reconciled">${status.reconciled}</td>
     <td  id="${status.id}-reconciling">${status.reconciling}</td>
     <td class="info" id="${status.id}-expired">${status.expired}</td>
@@ -44,8 +46,12 @@
 </table>
 </div>
 #end
-
+<div class="container">
+<p id="demo">sselet a row to see reconcile records</p>
+<p id="reconcileTableHolder">awaiting selection</p>
+</div>
 </body>
+
 <script>
 var webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/live-stats/");
 webSocket.onmessage = function (msg) { updateStats(msg); };
@@ -56,5 +62,41 @@ function updateStats(msg) {
     document.getElementById(data.id+ "-reconciling" ).innerHTML =  data.reconciling;
     document.getElementById(data.id+ "-reconciled" ).innerHTML =  data.reconciled;
 }
+
+function showRecords(reconcilerId){
+    document.getElementById("demo").innerHTML = reconcilerId;
+    document.getElementById("reconcileTableHolder").innerHTML = "loading data...";
+    req = 'reports/reconcile/reconcilerReport_' + reconcilerId +'.json';
+    $.get( req, function(reconcilerReport) {
+        document.getElementById("reconcileTableHolder").innerHTML = "<table width='100%' class='display' id='example'></table>";
+
+        cols = reconcilerReport.columns.length;
+        dateCols = [2];
+        for(i = 3; i< cols; i++){
+            dateCols.push(i);
+       }
+        $('#example').DataTable( {
+                data: reconcilerReport.data,
+                columns: reconcilerReport.columns,
+                "deferRender": true,
+                "columnDefs": [{
+                    targets: dateCols,
+                    render: function(now, type, full, meta){
+                        if(now < 0)
+                            return "no ack";
+                        seconds = Math.trunc(now / 1000);
+                        millis = now % 1000;
+                        s = seconds % 60;
+                        m = Math.trunc((seconds / 60) % 60);
+                        h = Math.trunc((seconds / (60 * 60))) % 24;
+                        s = s<10?"0"+s:s;
+                        m = m<10?"0"+m:m;
+                        return h +":" + m + ":" + s + "." + millis;
+                    }
+                }]
+        });
+    });
+}
 </script>
 </html>
+
