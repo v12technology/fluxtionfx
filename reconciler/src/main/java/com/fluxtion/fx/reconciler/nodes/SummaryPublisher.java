@@ -22,11 +22,10 @@ import com.fluxtion.api.annotations.Initialise;
 import com.fluxtion.api.annotations.NoEventReference;
 import com.fluxtion.api.annotations.OnEvent;
 import com.fluxtion.api.annotations.OnParentUpdate;
-import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.node.biascheck.TimedNotifier;
+import com.fluxtion.fx.reconciler.events.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
-import static com.fluxtion.fx.reconciler.extensions.ReconcileSummaryListener.RECONCILE_LISTENER;
 import com.fluxtion.fx.reconciler.extensions.ReconcileSummaryListener;
 
 /**
@@ -52,9 +51,11 @@ public class SummaryPublisher {
     private ReconcileSummaryListener reconcilerListener;
     private boolean publishNotification;
 
-    @EventHandler(filterString = RECONCILE_LISTENER, propogate = false)
+    @EventHandler(filterStringFromClass = ReconcileSummaryListener.class, propogate = false)
+//    @EventHandler(filterString = RECONCILE_LISTENER, propogate = false)
     public void registerReconcileListerner(ListenerRegisration<ReconcileSummaryListener> registration) {
         reconcilerListener = registration.getListener();
+        reconcilerListener.reconcileSummary(reconciler.id, 0, 0, 0);
     }
 
     @OnParentUpdate

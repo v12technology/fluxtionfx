@@ -35,8 +35,6 @@ import com.fluxtion.runtime.lifecycle.Lifecycle;
  */
 public interface ReconcileReportPublisher extends Lifecycle {
 
-    public static final String RESULT_PUBLISHER = "com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher";
-
     /**
      * A request to publish a report
      *
@@ -44,6 +42,10 @@ public interface ReconcileReportPublisher extends Lifecycle {
      * @param reconcilerId The reconcilerId to publish the report for
      */
     void publishReport(ReconcileCacheQuery reconcileCache, String reconcilerId);
+    
+    default String getReconcilerReport(){
+        return null;
+    }
 
     default void conifgure(ReportConfiguration config){ }
     

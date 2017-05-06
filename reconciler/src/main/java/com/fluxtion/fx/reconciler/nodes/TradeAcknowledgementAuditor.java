@@ -20,7 +20,6 @@ import com.fluxtion.api.annotations.EventHandler;
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 import com.fluxtion.fx.reconciler.extensions.TradeAcknowledgementListener;
-import static com.fluxtion.fx.reconciler.extensions.TradeAcknowledgementListener.TA_LISTENER;
 
 /**
  * Listens to TradeAcknowledgement events and delegates processing to the
@@ -45,7 +44,7 @@ public class TradeAcknowledgementAuditor {
         }
     }
 
-    @EventHandler(filterString = TA_LISTENER, propogate = false)
+    @EventHandler(filterStringFromClass = TradeAcknowledgementListener.class, propogate = false)
     public void registerAuditor(ListenerRegisration<TradeAcknowledgementListener> registration) {
         this.auditor = registration.getListener();
     }

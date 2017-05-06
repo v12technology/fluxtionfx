@@ -16,8 +16,6 @@
  */
 package com.fluxtion.fx.reconciler.events;
 
-import com.fluxtion.runtime.event.Event;
-
 /**
  * ControlSignal is an event that provides a generic method for nodes to receive
  * control signals without having to define bespoke control events for each type
@@ -43,7 +41,7 @@ import com.fluxtion.runtime.event.Event;
  *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  */
-public class ControlSignal extends Event {
+public class ControlSignal extends MarshallableEvent {
 
     private final boolean enabled;
 

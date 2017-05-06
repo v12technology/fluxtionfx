@@ -23,8 +23,6 @@ package com.fluxtion.fx.reconciler.extensions;
  */
 public interface ReconcileSummaryListener {
     
-    public static final String RECONCILE_LISTENER = "com.fluxtion.fx.reconciler.extensions.ReconcileSummaryListener";
-    
     /**
      * Summary update notification
      * @param reconcilerId reconciler identifier

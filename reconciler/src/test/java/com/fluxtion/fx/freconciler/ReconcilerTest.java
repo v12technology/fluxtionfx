@@ -152,7 +152,8 @@ public class ReconcilerTest {
         final TimingPulseEvent timingPulseEvent = new TimingPulseEvent(1);
         timingPulseEvent.setCurrentTimeMillis(1 * 1000);
         reconciler.onEvent(timingPulseEvent);
-        summarySize(summaryListener, 0);
+        summarySize(summaryListener, 5);
+        summaryListener.reconciler2Update.clear();
         //match a trade
         reconciler.onEvent(new TradeAcknowledgement("NY_2", 200, 2000));
         timingPulseEvent.setCurrentTimeMillis(2 * 1000);
@@ -187,7 +188,8 @@ public class ReconcilerTest {
         final TimingPulseEvent timingPulseEvent = new TimingPulseEvent(1);
         timingPulseEvent.setCurrentTimeMillis(1 * 1000);
         reconciler.onEvent(timingPulseEvent);
-        summarySize(summaryListener, 0);
+        summarySize(summaryListener, 5);
+        summaryListener.reconciler2Update.clear();
         //match a trade
         reconciler.onEvent(new TradeAcknowledgement("NY_2", 200, 2000));
         timingPulseEvent.setCurrentTimeMillis(2 * 1000);
@@ -248,6 +250,7 @@ public class ReconcilerTest {
     @Test
     public void dumpReconcileRecordsAsJsonWithAsyncJsonReportPublisher() throws IOException {
         SynchronousJsonReportPublisher publisher = new SynchronousJsonReportPublisher();
+        publisher.arrayFormat = false;
         reconciler.onEvent(new ListenerRegisration(publisher, ReconcileReportPublisher.class));
 
         ReportConfiguration config = new ReportConfiguration();

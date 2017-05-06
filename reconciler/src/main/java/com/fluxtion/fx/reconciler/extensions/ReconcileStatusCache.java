@@ -30,8 +30,6 @@ import java.util.function.BiConsumer;
  */
 public interface ReconcileStatusCache<T> {
 
-    public static final String RECONCILE_STATUS_CACHE = "com.fluxtion.fx.reconciler.extensions.ReconcileStatusCache";
-
     /**
      * reset cache to initial state
      */

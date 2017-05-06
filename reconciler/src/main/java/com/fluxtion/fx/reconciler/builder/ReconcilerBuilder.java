@@ -173,6 +173,7 @@ public class ReconcilerBuilder {
             ctx.put("oneOfSources", "\"" + String.join("\", \"", oneOfSources) + "\"");
         }
         ctx.put("venues", "\"" + String.join("\", \"", mandatorySources) + "\"");
+        ctx.put("allVenues", "\"" + String.join("\", \"", getSources() ) + "\"");
         Class<TradeReconciler> aggClass = FunctionGeneratorHelper.generateAndCompile(null, RECONCILER_TEMPLATE, GenerationContext.SINGLETON, ctx);
         //reconciler - dynamically generated
         TradeReconciler result = aggClass.newInstance();

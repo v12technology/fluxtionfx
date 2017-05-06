@@ -77,11 +77,20 @@ public interface ReconcileStatus<T> {
     boolean expired(long currentTime, int expiryTimeout);
 
     /**
-     * Appends a json formatted string to the StringBuilder for this record.
+     * Appends a json formatted string to the StringBuilder for this record in json object 
+     * format.
      *
      * @param builder
      */
     void appendAsJson(StringBuilder builder);
+    
+    /**
+     * Appends a json formatted string to the StringBuilder for this record in json array 
+     * format.
+     *
+     * @param builder
+     */
+    public void appendAsJsonArray(StringBuilder builder);
 
     /**
      * set the status of the reconcile record

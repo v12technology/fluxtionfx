@@ -33,6 +33,29 @@ import static com.fluxtion.fx.reconciler.helpers.ReconcileStatus.Status.*;
  */
 public class  ${functionClass} extends TradeReconciler<${functionClass}.ReconcileRecord>{
 
+    private static final String[] ALL_VENUES = new String[]{ ${allVenues} };
+    private static final String[] VENUES = new String[]{${venues}};
+#if( ${oneOfSources} )
+    private static final String[] VENUES_ONE_OF = new String[]{${oneOfSources}};
+#else
+    private static final String[] VENUES_ONE_OF = new String[0];
+#end
+
+    @Override
+    public String[] allVenues(){
+        return ALL_VENUES;
+    }
+
+    @Override
+    public String[] mandatoryVenues(){
+        return VENUES;
+    }
+
+    @Override
+    public String[] oneOfVenues(){
+        return VENUES_ONE_OF;
+    }
+
 #foreach( $source in $reconcilerBuilder.sources)
     @EventHandler(filterString = "$source")
     public void tradeAckFrom_$source (TradeAcknowledgement acknowledgement){
@@ -62,12 +85,6 @@ public class  ${functionClass} extends TradeReconciler<${functionClass}.Reconcil
 
     public static class ReconcileRecord implements ReconcileStatus<Integer>{
 
-        private static final String[] VENUES = new String[]{${venues}};
-#if( ${oneOfSources} )
-        private static final String[] VENUES_ONE_OF = new String[]{${oneOfSources}};
-#else
-        private static final String[] VENUES_ONE_OF = new String[0];
-#end
         Status status = RECONCILING;;
         int tradeId;
         long firstReceivedTime = -1;
@@ -129,6 +146,19 @@ public class  ${functionClass} extends TradeReconciler<${functionClass}.Reconcil
                     .append("}#if( $foreach.hasNext ), #end")
 #end
                     .append("]}");
+        }
+
+        public void appendAsJsonArray(StringBuilder builder){
+            builder.append('[')
+                    .append(tradeId)
+                    .append(",\"")
+                    .append(status.name())
+                    .append("\",")
+#foreach( $source in $reconcilerBuilder.sources)
+                    .append(time_$source)
+                    .append("#if( $foreach.hasNext ), #end")
+#end
+                    .append("]");
         }
 
         @Override

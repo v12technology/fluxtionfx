@@ -20,8 +20,8 @@ import com.fluxtion.api.annotations.AfterEvent;
 import com.fluxtion.api.annotations.EventHandler;
 import com.fluxtion.api.annotations.Initialise;
 import com.fluxtion.api.annotations.OnParentUpdate;
-import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.node.biascheck.TimedNotifier;
+import com.fluxtion.fx.reconciler.events.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
 import com.fluxtion.fx.reconciler.helpers.ReconcileStatus;
 import static com.fluxtion.fx.reconciler.helpers.ReconcileStatus.Status.EXPIRED_RECONCILE;
@@ -32,8 +32,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 /**
- * 
- * Base class for reconciling TradeAcknowledgements  from a a set of monitored venues. 
+ *
+ * Base class for reconciling TradeAcknowledgements from a a set of monitored
+ * venues.
  *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  * @param <T>
@@ -70,16 +71,22 @@ public abstract class TradeReconciler<T extends ReconcileStatus<Integer>> {
     public int getReconcile_expired() {
         return reconcile_expired;
     }
+
+    public abstract String[] allVenues();
     
+    public abstract  String[] mandatoryVenues();
+
+    public abstract String[] oneOfVenues();
+
     @OnParentUpdate
     public void expireTimedOutReconciles(TimedNotifier timedNotifier) {
         long timeInSeconds = timedNotifier.timeInSeconds();
         Int2ObjectMap.FastEntrySet<T> int2ObjectEntrySet = id2Reconcile.int2ObjectEntrySet();
         ObjectIterator<Int2ObjectMap.Entry<T>> fastIterator = int2ObjectEntrySet.fastIterator();
-        while(fastIterator.hasNext()){
+        while (fastIterator.hasNext()) {
             Int2ObjectMap.Entry<T> next = fastIterator.next();
             T record = next.getValue();
-            if(record.expired(timeInSeconds*1000, reconcileTimeout*1000)){
+            if (record.expired(timeInSeconds * 1000, reconcileTimeout * 1000)) {
                 record.setStatus(EXPIRED_RECONCILE);
                 fastIterator.remove();
                 expiredList.add(record);
@@ -102,11 +109,11 @@ public abstract class TradeReconciler<T extends ReconcileStatus<Integer>> {
         reconciling = 0;
         reconcile_expired = 0;
     }
-    
+
     @AfterEvent
-    public void resetAfterUpdate(){
+    public void resetAfterUpdate() {
         currentRecord = null;
         expiredList.clear();
     }
-    
+
 }

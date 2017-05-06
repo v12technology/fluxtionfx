@@ -24,8 +24,6 @@ import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
  * @author Greg Higgins (greg.higgins@V12technology.com)
  */
 public interface TradeAcknowledgementListener {
-    public static final String TA_LISTENER = "com.fluxtion.fx.reconciler.extensions.TradeAcknowledgementListener";
-    
     /**
      * Notification of a new TradeAcknowledgementListener event
      * @param tradeAcknowledgement the new acknowledgement

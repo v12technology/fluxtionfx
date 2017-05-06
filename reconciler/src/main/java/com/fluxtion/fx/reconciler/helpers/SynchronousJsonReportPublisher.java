@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +42,7 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
 
     private final AtomicBoolean updated = new AtomicBoolean(false);
     public File reportDirectory;
+    public boolean arrayFormat = true;
     private File tmpFile;
     private RandomAccessFile tmpRanAccFile;
 
@@ -48,6 +50,7 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
     private static final int STRING_BUFFER_SIZE = 512;
     private ByteBuffer buffer;
     private StringBuilder sb;
+    private ConcurrentHashMap<String, StringBuilder> reportMap;
 
     @Override
     public void publishReport(ReconcileCacheQuery reconcileResultcCche, String reconcilerId) {
@@ -58,16 +61,35 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
             } else {
                 tmpRanAccFile = null;
                 try {
-                    tmpFile = Files.createTempFile(reportDirectory.toPath(), "reconcilerReport", "_" + reconcilerId + ".json").toFile();
+//                    tmpFile = Files.createTempFile(reportDirectory.toPath(), "reconcilerReport", "_" + reconcilerId + ".json").toFile();
+                    Path finalReportPath = Paths.get(reportDirectory.getAbsolutePath(), "reconcilerReport_" + reconcilerId + ".json");
+                    tmpFile = finalReportPath.toFile();
                     tmpRanAccFile = new RandomAccessFile(tmpFile, "rw");
-                } catch (FileNotFoundException e1) {
-                } catch (IOException ex) {
+                    tmpRanAccFile.setLength(0);
+                } catch (Exception ex) {
                     Logger.getLogger(SynchronousJsonReportPublisher.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                sb.append("{\"reconciler\": \"").append(reconcilerId).append("\", \"records\":[\n");
+                sb.append("{\"reconciler\": \"").append(reconcilerId);
+                if (arrayFormat) {
+                    String[] allVenues = reconcileResultcCche.allVenues(reconcilerId);
+                    sb.append("\",\n\"columns\": [\n{ \"title\": \"tradeId\"},{ \"title\": \"status\"},");
+                    for (int i = 0; i < allVenues.length; i++) {
+                        String allVenue = allVenues[i];
+                        sb.append("{ \"title\": \"").append(allVenue).append("\" },");
+                    }
+                    sb.setLength(sb.length() - 1);
+                    sb.append("],\n");
+                    sb.append("\"data\":[\n");
+                } else {
+                    sb.append("\", \"records\":[\n");
+                }
             }
             updated.lazySet(true);
-            s.appendAsJson(sb);
+            if (arrayFormat) {
+                s.appendAsJsonArray(sb);
+            } else {
+                s.appendAsJson(sb);
+            }
 
             while (sb.length() > buffer.remaining()) {
                 buffer = ByteBuffer.allocate(buffer.limit() * 2);
@@ -97,8 +119,8 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
                 tmpRanAccFile.writeByte('}');
                 tmpRanAccFile.close();
                 //delet and move to final report
-                Path finalReportPath = Paths.get(reportDirectory.getAbsolutePath(), "reconcilerReport_" + reconcilerId + ".json");
-                Files.move(tmpFile.toPath(), finalReportPath, StandardCopyOption.REPLACE_EXISTING);
+//                Path finalReportPath = Paths.get(reportDirectory.getAbsolutePath(), "reconcilerReport_" + reconcilerId + ".json");
+//                Files.move(tmpFile.toPath(), finalReportPath, StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException ex) {
                 Logger.getLogger(SynchronousJsonReportPublisher.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -112,14 +134,13 @@ public class SynchronousJsonReportPublisher implements ReconcileReportPublisher 
         reportDirectory.mkdirs();
     }
 
-    
-    
     @Override
     public void init() {
         sb = new StringBuilder(STRING_BUFFER_SIZE);
         buffer = ByteBuffer.allocate(PAGE_SIZE);
         reportDirectory = new File("public/reports/reconcile/");
         reportDirectory.mkdirs();
+        reportMap = new ConcurrentHashMap<>();
     }
 
     @Override

@@ -42,4 +42,13 @@ public interface ReconcileCacheQuery {
      */
     void stream(Consumer<? super ReconcileStatus> consumer, String reconcilerId);
 
+    /**
+     * provides an ordered list of all venues monitored by a reconciler, as provided by the TradeReconciler.allVenues
+     * method.
+     * 
+     * @param reconcilerId the id of a trade reconciler
+     * @return The ordered list of monitored venues
+     */
+    String[] allVenues(String reconcilerId);
+
 }

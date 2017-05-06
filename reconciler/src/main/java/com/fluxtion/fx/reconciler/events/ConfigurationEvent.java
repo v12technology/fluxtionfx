@@ -17,14 +17,13 @@
 package com.fluxtion.fx.reconciler.events;
 
 import static com.fluxtion.fx.event.FxEventIdList.CONFIGURAION_EVENT;
-import com.fluxtion.runtime.event.Event;
 
 /**
  *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  * @param <T>
  */
-public class ConfigurationEvent<T> extends Event {
+public class ConfigurationEvent<T> extends MarshallableEvent {
 
     public static final int ID = CONFIGURAION_EVENT;
     private T configuration;

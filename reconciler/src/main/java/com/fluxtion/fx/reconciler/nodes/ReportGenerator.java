@@ -21,15 +21,13 @@ import com.fluxtion.api.annotations.EventHandler;
 import com.fluxtion.api.annotations.Initialise;
 import com.fluxtion.api.annotations.NoEventReference;
 import com.fluxtion.api.annotations.OnEvent;
-import com.fluxtion.api.annotations.OnEventComplete;
 import com.fluxtion.api.annotations.OnParentUpdate;
-import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.node.biascheck.TimedNotifier;
 import com.fluxtion.fx.reconciler.events.ConfigEvents;
 import com.fluxtion.fx.reconciler.events.ConfigurationEvent;
+import com.fluxtion.fx.reconciler.events.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
-import static com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher.RESULT_PUBLISHER;
 import com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher;
 import com.fluxtion.fx.reconciler.helpers.ReportConfiguration;
 
@@ -80,7 +78,7 @@ public class ReportGenerator {
         publishReport = true;
     }
 
-    @EventHandler(filterString = RESULT_PUBLISHER, propogate = false)
+    @EventHandler(filterStringFromClass = ReconcileReportPublisher.class, propogate = false)
     public void registerPublisher(ListenerRegisration<ReconcileReportPublisher> registration) {
         this.publisher = registration.getListener();
         this.publisher.init();

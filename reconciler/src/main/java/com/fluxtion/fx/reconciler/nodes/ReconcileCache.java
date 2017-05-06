@@ -17,14 +17,15 @@
 package com.fluxtion.fx.reconciler.nodes;
 
 import com.fluxtion.api.annotations.EventHandler;
+import com.fluxtion.api.annotations.Initialise;
 import com.fluxtion.api.annotations.OnParentUpdate;
-import com.fluxtion.fx.event.ControlSignal;
+
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.event.TimingPulseEvent;
+import com.fluxtion.fx.reconciler.events.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
-import static com.fluxtion.fx.reconciler.extensions.ReconcileStatusCache.RECONCILE_STATUS_CACHE;
 import com.fluxtion.fx.reconciler.extensions.ReconcileStatusCache;
-import com.fluxtion.fx.reconciler.extensions.ReconcileStatusCache.ReconcileKey;
+import com.fluxtion.fx.reconciler.helpers.ConcurrentHashMapReconcileCache;
 import com.fluxtion.fx.reconciler.helpers.ReconcileStatus;
 import com.fluxtion.fx.reconciler.helpers.ReconcileCacheQuery;
 import java.util.ArrayList;
@@ -52,11 +53,24 @@ public class ReconcileCache implements ReconcileCacheQuery{
 
     public TradeReconciler[] reconcilers;
     private ReconcileStatusCache cache;
+    private static final String[] EMPTY_ARR = new String[0];
+    
+    @Override
+    public String[] allVenues(String reconcilerId){
+        for (int i = 0; i < reconcilers.length; i++) {
+            TradeReconciler reconciler = reconcilers[i];
+            if(reconciler.id.equals(reconcilerId)){
+                return reconciler.allVenues();
+            }
+        }
+        return EMPTY_ARR;
+    }
     
     @Override
     public void stream(BiConsumer<? super ReconcileStatusCache.ReconcileKey, ? super ReconcileStatus>  consumer){
         cache.stream(consumer);
     }
+    
     
     @Override
     public void stream(Consumer<? super ReconcileStatus> consumer, String reconcilerId){
@@ -67,7 +81,8 @@ public class ReconcileCache implements ReconcileCacheQuery{
         });        
     }
     
-    @EventHandler(filterString = RECONCILE_STATUS_CACHE, propogate = false)
+    @EventHandler(filterStringFromClass = ReconcileStatusCache.class, propogate = false)
+//    @EventHandler(filterString = RECONCILE_STATUS_CACHE, propogate = false)
     public void registerReconcileCache(ListenerRegisration<ReconcileStatusCache> registration) {
         this.cache = registration.getListener();
     }
@@ -109,7 +124,10 @@ public class ReconcileCache implements ReconcileCacheQuery{
             reconcilers = tmp;
         }
     }
-    
 
+    @Initialise
+    public void init(){
+        cache = new ConcurrentHashMapReconcileCache();
+    }
     
 }
