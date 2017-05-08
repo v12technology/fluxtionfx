@@ -45,12 +45,19 @@ public class ChronicleTest {
                 System.out.println(ack1);
                 handler.onEvent(ack1);
                 handler.onEvent(ack1);
+                handler.onEvent(ack1);
+                handler.onEvent(ack1);
+                Assert.assertEquals(1, TradeAcknowledgement.DEFAULT_CONSTRUCTOR_COUNT);
+                TradeAcknowledgement.DEFAULT_CONSTRUCTOR_COUNT = 0;
                 //read from queue
                 TradeAckHandler sep = new TradeAckHandler();
                 MethodReader methodReader = queue.createTailer().methodReader(sep);
                 System.out.println("reading events");
                 methodReader.readOne();
                 methodReader.readOne();
+                methodReader.readOne();
+                methodReader.readOne();
+                
                 Assert.assertEquals(1,TradeAcknowledgement.DEFAULT_CONSTRUCTOR_COUNT);
             }
         } finally {
