@@ -20,11 +20,13 @@ package com.fluxtion.chronicleintegration;
  *
  * @author Greg Higgins (greg.higgins@V12technology.com)
  */
-public class TradeAckHandler implements EventHandler{
+public class TradeAckHandler implements EventHandler<TradeAcknowledgement>{
 
+    public int invocationCount = 0;
+    
     @Override
-    public void onEvent(Event e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void onEvent(TradeAcknowledgement e) {
+        invocationCount++;
     }
     
 }

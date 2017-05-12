@@ -58,6 +58,7 @@ public class ChronicleTest {
                 methodReader.readOne();
                 methodReader.readOne();
                 
+                Assert.assertEquals(4,sep.invocationCount);
                 Assert.assertEquals(1,TradeAcknowledgement.DEFAULT_CONSTRUCTOR_COUNT);
             }
         } finally {
