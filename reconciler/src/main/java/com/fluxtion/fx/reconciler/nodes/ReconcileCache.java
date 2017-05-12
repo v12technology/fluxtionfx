@@ -22,7 +22,7 @@ import com.fluxtion.api.annotations.OnParentUpdate;
 
 import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.event.TimingPulseEvent;
-import com.fluxtion.fx.reconciler.events.ControlSignal;
+import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
 import com.fluxtion.fx.reconciler.extensions.ReconcileStatusCache;
 import com.fluxtion.fx.reconciler.helpers.ConcurrentHashMapReconcileCache;

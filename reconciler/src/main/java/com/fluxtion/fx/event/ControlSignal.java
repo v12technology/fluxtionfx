@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.events;
+package com.fluxtion.fx.event;
 
 /**
  * ControlSignal is an event that provides a generic method for nodes to receive

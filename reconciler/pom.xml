@@ -92,11 +92,30 @@
     </build>   
    
     <dependencies>
-        <dependency>
+<!--        <dependency>
             <groupId>com.fluxtion.extension</groupId>
             <artifactId>fluxtion-fx-api</artifactId>
             <version>${fluxtion.ver}</version>
+        </dependency>-->
+        
+        <dependency>
+            <groupId>com.fluxtion</groupId>
+            <artifactId>fluxtion-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fluxtion</groupId>
+            <artifactId>fluxtion-builder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fluxtion.extension</groupId>
+            <artifactId>fluxtion-declarative-ext-api</artifactId>
+        </dependency>   
+        
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>chronicle-queue</artifactId>
@@ -161,9 +180,5 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-    </dependencyManagement>
-        
-        
-        
-        
+    </dependencyManagement>      
 </project>

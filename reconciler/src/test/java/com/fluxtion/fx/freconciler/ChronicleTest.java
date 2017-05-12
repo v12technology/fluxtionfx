@@ -19,6 +19,12 @@ package com.fluxtion.fx.freconciler;
 import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 import com.fluxtion.runtime.lifecycle.EventHandler;
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.core.io.IOTools;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueue;
@@ -60,4 +66,41 @@ public class ChronicleTest {
         }
 
     }
+
+    @Test
+    public void testAll() throws InterruptedException, ExecutionException {
+//        SynchronousQueue queue = new SynchronousQueue();
+//        System.out.println("polling synchronously queue");
+//        Object poll = queue.poll();
+//        System.out.println("polled:" + poll);
+        MyQueue q = new MyQueue(700);
+        q.processEvent("fred");
+        q.processEvent("tom");
+        Thread.sleep(3000);
+        q.processEvent("george");
+    }
+
+    private static class MyQueue {
+
+        ScheduledExecutorService reader;
+
+        public MyQueue(int millisecondSleep) {
+            reader = Executors.newSingleThreadScheduledExecutor();
+            reader.scheduleAtFixedRate(() -> System.out.println(getTIme() + " draining queue"), millisecondSleep, millisecondSleep, TimeUnit.MILLISECONDS);
+
+        }
+
+        //ScheduledExecutorService executor;
+        public void processEvent(String s) throws InterruptedException, ExecutionException {
+            long now = System.currentTimeMillis();
+            System.out.println(getTIme() + " submitted:" + s);
+            reader.submit(() -> System.out.println(getTIme() + " success:"  + s)).get();
+            System.out.println(getTIme() + " processed, delay:" + (System.currentTimeMillis() - now));
+        }
+
+        public static synchronized String getTIme() {
+            return Thread.currentThread().getName() + ", " + DateFormat.getTimeInstance().format(new Date());
+        }
+    }
+
 }

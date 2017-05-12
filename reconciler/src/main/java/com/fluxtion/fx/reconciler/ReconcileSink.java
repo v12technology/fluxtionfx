@@ -14,27 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.events;
+package com.fluxtion.fx.reconciler;
 
-import static com.fluxtion.fx.event.FxEventIdList.CONFIGURAION_EVENT;
+import com.fluxtion.fx.event.TimingPulseEvent;
+import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 
 /**
- *
+ * A message sink for TradeAcknowledgement messages.
+ * 
  * @author Greg Higgins (greg.higgins@V12technology.com)
- * @param <T>
  */
-public class ConfigurationEvent<T> extends MarshallableEvent {
-
-    public static final int ID = CONFIGURAION_EVENT;
-    private T configuration;
-
-    public ConfigurationEvent(T configuration, String confgiKey) {
-        super(CONFIGURAION_EVENT, confgiKey);
-        this.configuration = configuration;
-    }
-
-    public T getConfiguration() {
-        return configuration;
-    }
-
+public interface ReconcileSink {
+    void processTradeAcknowledgement(TradeAcknowledgement acknowledgedment);
+    void timeUpdate(TimingPulseEvent timingEvent);
 }

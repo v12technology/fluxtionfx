@@ -16,6 +16,7 @@
  */
 package com.fluxtion.fx.reconciler.events;
 
+import com.fluxtion.fx.event.MarshallableEvent;
 import com.fluxtion.runtime.event.Event;
 import java.util.Arrays;
 

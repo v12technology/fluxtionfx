@@ -18,7 +18,7 @@ package com.fluxtion.fx.reconciler.helpers;
 
 import com.fluxtion.api.generation.NodeNameProducer;
 import com.fluxtion.fx.eventhandler.TimeHandlerSeconds;
-import com.fluxtion.fx.node.biascheck.TimedNotifier;
+import com.fluxtion.fx.eventhandler.TimedNotifier;
 import com.fluxtion.fx.reconciler.nodes.ReportGenerator;
 import com.fluxtion.fx.reconciler.nodes.ReconcileCache;
 import com.fluxtion.fx.reconciler.nodes.SummaryPublisher;

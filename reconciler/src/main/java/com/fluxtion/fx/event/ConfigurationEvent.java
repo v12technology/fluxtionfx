@@ -14,21 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.fluxtion.fx.reconciler.events;
+package com.fluxtion.fx.event;
 
-import com.fluxtion.fx.event.ConfigurationEvent;
-import com.fluxtion.fx.reconciler.helpers.ReportConfiguration;
+import static com.fluxtion.fx.event.FxEventIdList.CONFIGURAION_EVENT;
 
 /**
  *
  * @author Greg Higgins (greg.higgins@V12technology.com)
+ * @param <T>
  */
-public interface ConfigEvents {
+public class ConfigurationEvent<T> extends MarshallableEvent {
 
-    public static final String REPORT_CONFIG = "com.fluxtion.fx.reconciler.publishResults.config";
-    
-    public static ConfigurationEvent<ReportConfiguration> reportConfig(ReportConfiguration config){
-        return new ConfigurationEvent<>(config, REPORT_CONFIG);
+    public static final int ID = CONFIGURAION_EVENT;
+    private T configuration;
+
+    public ConfigurationEvent(T configuration, String confgiKey) {
+        super(CONFIGURAION_EVENT, confgiKey);
+        this.configuration = configuration;
     }
-    
+
+    public T getConfiguration() {
+        return configuration;
+    }
+
 }

@@ -16,6 +16,8 @@
  */
 package com.fluxtion.fx.reconciler.events;
 
+import com.fluxtion.fx.event.ControlSignal;
+
 
 /**
  * A lookup for Filters and control signals that are consistently named.

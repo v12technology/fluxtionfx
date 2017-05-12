@@ -23,8 +23,8 @@ import com.fluxtion.api.annotations.NoEventReference;
 import com.fluxtion.api.annotations.OnEvent;
 import com.fluxtion.api.annotations.OnParentUpdate;
 import com.fluxtion.fx.event.ListenerRegisration;
-import com.fluxtion.fx.node.biascheck.TimedNotifier;
-import com.fluxtion.fx.reconciler.events.ControlSignal;
+import com.fluxtion.fx.eventhandler.TimedNotifier;
+import com.fluxtion.fx.event.ControlSignal;
 import com.fluxtion.fx.reconciler.events.ControlSignals;
 import com.fluxtion.fx.reconciler.extensions.ReconcileSummaryListener;
 

@@ -26,7 +26,7 @@ import com.fluxtion.extension.declarative.builder.factory.FunctionGeneratorHelpe
 import static com.fluxtion.extension.declarative.builder.factory.FunctionKeys.functionClass;
 import com.fluxtion.extension.declarative.builder.util.ImportMap;
 import com.fluxtion.fx.eventhandler.TimeHandlerSeconds;
-import com.fluxtion.fx.node.biascheck.TimedNotifier;
+import com.fluxtion.fx.eventhandler.TimedNotifier;
 import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 import com.fluxtion.fx.reconciler.helpers.ReconcileStatus;
 import com.fluxtion.fx.reconciler.nodes.ReportGenerator;
