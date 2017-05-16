@@ -17,8 +17,6 @@
 package com.fluxtion.fx.reconciler.events;
 
 import com.fluxtion.fx.event.MarshallableEvent;
-import com.fluxtion.runtime.event.Event;
-import java.util.Arrays;
 
 /**
  * A TradeAcknowledgement event indicates a venue has acknowledged a Trade. The
@@ -35,8 +33,6 @@ public class TradeAcknowledgement extends MarshallableEvent {
 
     public TradeAcknowledgement() {
         super();
-        System.out.println("TradeAcknowledgement::constructor");
-        System.out.println(Arrays.toString(Thread.currentThread().getStackTrace()).replace(',', '\n'));
     }
 
     public TradeAcknowledgement(String venueId, int tradeId) {
