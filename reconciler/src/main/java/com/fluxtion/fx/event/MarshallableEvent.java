@@ -30,7 +30,6 @@ public abstract class MarshallableEvent extends Event implements Marshallable {
 
     public MarshallableEvent(int id) {
         super(id);
-        System.out.println("MarshallableEvent::constructor");
     }
 
     public MarshallableEvent(int id, int filterId) {
