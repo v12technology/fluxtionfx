@@ -37,12 +37,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.openhft.chronicle.queue.ExcerptTailer;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
 import net.openhft.chronicle.wire.MethodReader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * A reconciler facade that will write reconcile events to chronicle queue and
@@ -60,11 +60,13 @@ public class ChronicleQueueSource implements ReconcileController {
     private EventHandler eventHandler;
     private MethodReader methodReader;
     private ExcerptTailer tailer;
+    private static final Logger LOGGER = LogManager.getFormatterLogger(ChronicleQueueSource.class);
 
     @Override
     public void run() {
         TimingPulseEvent pulse = new TimingPulseEvent(1);
         if (eventExecutor == null || eventExecutor.isShutdown()) {
+            LOGGER.info("starting queue reader task");
             eventExecutor = Executors.newSingleThreadScheduledExecutor();
             replay();
             eventExecutor.scheduleAtFixedRate(() -> {
@@ -87,6 +89,7 @@ public class ChronicleQueueSource implements ReconcileController {
 
     @Override
     public void replay() {
+        LOGGER.info("replaying events into reconciler");
         long now = System.currentTimeMillis();
         LongAdder adder = new LongAdder();
         executeAndWait(() -> {
@@ -96,7 +99,7 @@ public class ChronicleQueueSource implements ReconcileController {
                 adder.increment();
             }
         });
-//        System.out.println("loaded " + adder.intValue() + " in " + (System.currentTimeMillis() - now) + " millis");
+        LOGGER.info("finished replaying %d events into reconciler in %d millis", adder.intValue() , (System.currentTimeMillis() - now) );
     }
 
     @Override
@@ -188,9 +191,9 @@ public class ChronicleQueueSource implements ReconcileController {
         public ChronicleQueueSourceBuilder chronicleFile(String filePath) {
             File queuePath = new File(filePath);
             try {
-                System.out.println("storing queue at:" + queuePath.getCanonicalPath());
+                LOGGER.info("storing queue at:" + queuePath.getCanonicalPath());
             } catch (IOException ex) {
-                Logger.getLogger(ChronicleQueueSource.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.error("could not read queue path", ex);
             }
             source.queue = SingleChronicleQueueBuilder.binary(queuePath).build();
             source.tailer = source.queue.createTailer();
