@@ -22,6 +22,8 @@ import com.fluxtion.fx.reconciler.helpers.SynchronousJsonReportPublisher;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
@@ -38,6 +40,7 @@ public class SparkInitialiserFromController implements ReconcileSummaryListener 
     private final ReconcileController reconciler;
     private final ConcurrentHashMap<String, ReconcilerStatus> reconcilerMap;
     private final Map<String, Object> velocityMap;
+    private static final Logger LOGGER = LogManager.getFormatterLogger(SparkInitialiserFromController.class);
 
     public SparkInitialiserFromController(ReconcileController reconciler) {
         this.reconciler = reconciler;
@@ -47,11 +50,16 @@ public class SparkInitialiserFromController implements ReconcileSummaryListener 
     }
 
     public void init() {
+        LOGGER.info("initialising webapp");
         staticFiles.externalLocation("public");
         webSocket("/live-stats", StatsPusher.class);
         get("/reconcile-status", (req, resp) -> render(velocityMap, "reconcilerSummary.vsl"));
         reconciler.registerReconcileSummaryListener(this);
         reconciler.registerReconcileReportPublisher(new SynchronousJsonReportPublisher());
+        long now = System.currentTimeMillis();
+        reconciler.publishSummaryUpdate();
+        reconciler.publishReports();
+        LOGGER.info("completed publishing reports %d millis", (System.currentTimeMillis() - now));
     }
 
     public String render(Map<String, Object> model, String templatePath) {
