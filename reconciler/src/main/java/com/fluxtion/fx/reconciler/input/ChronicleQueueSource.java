@@ -20,6 +20,9 @@ import com.fluxtion.fx.event.ListenerRegisration;
 import com.fluxtion.fx.event.TimingPulseEvent;
 import com.fluxtion.fx.reconciler.ReconcileController;
 import com.fluxtion.fx.reconciler.ReconcileSink;
+import com.fluxtion.fx.reconciler.events.ControlSignals;
+import static com.fluxtion.fx.reconciler.events.ControlSignals.CLEAR_CACHE_ACTION;
+import static com.fluxtion.fx.reconciler.events.ControlSignals.PUBLISH_SUMMARY_ACTION;
 import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 import com.fluxtion.fx.reconciler.extensions.ReconcileReportPublisher;
 import com.fluxtion.fx.reconciler.extensions.ReconcileSummaryListener;
@@ -27,12 +30,16 @@ import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.lifecycle.EventHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import net.openhft.chronicle.core.OS;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.openhft.chronicle.queue.ExcerptTailer;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
 import net.openhft.chronicle.wire.MethodReader;
@@ -52,21 +59,23 @@ public class ChronicleQueueSource implements ReconcileController {
     private SingleChronicleQueue queue;
     private EventHandler eventHandler;
     private MethodReader methodReader;
+    private ExcerptTailer tailer;
 
     @Override
     public void run() {
         TimingPulseEvent pulse = new TimingPulseEvent(1);
         if (eventExecutor == null || eventExecutor.isShutdown()) {
             eventExecutor = Executors.newSingleThreadScheduledExecutor();
+            replay();
             eventExecutor.scheduleAtFixedRate(() -> {
                 while (methodReader.readOne()) {
                 }
             }, sleepBetweenChronicleReads, sleepBetweenChronicleReads, TimeUnit.MILLISECONDS);
             eventExecutor.scheduleAtFixedRate(() -> {
-                pulse.currentTimeMillis  = System.currentTimeMillis();
+                pulse.currentTimeMillis = System.currentTimeMillis();
                 eventHandler.onEvent(pulse);
             }, sleepBetweenChronicleReads, sleepBetweenChronicleReads, TimeUnit.MILLISECONDS);
-            
+
         }
     }
 
@@ -78,11 +87,38 @@ public class ChronicleQueueSource implements ReconcileController {
 
     @Override
     public void replay() {
-
+        long now = System.currentTimeMillis();
+        LongAdder adder = new LongAdder();
+        executeAndWait(() -> {
+            eventHandler.onEvent(CLEAR_CACHE_ACTION);
+            tailer.toStart();
+            while (methodReader.readOne()) {
+                adder.increment();
+            }
+        });
+//        System.out.println("loaded " + adder.intValue() + " in " + (System.currentTimeMillis() - now) + " millis");
     }
 
     @Override
     public void clear() {
+        executeAndWait(() -> {
+            eventHandler.onEvent(CLEAR_CACHE_ACTION);
+            queue.clear();
+            tailer.toStart();
+        });
+
+    }
+
+    private void executeAndWait(Runnable run) {
+        try {
+            if (eventExecutor == null || eventExecutor.isShutdown()) {
+                run.run();
+            } else {
+                eventExecutor.submit(run).get();
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            throw new RuntimeException("could not exectue synchronous event", ex);
+        }
 
     }
 
@@ -107,8 +143,13 @@ public class ChronicleQueueSource implements ReconcileController {
     }
 
     @Override
+    public void publishSummaryUpdate() {
+        executeEventSynchronously(PUBLISH_SUMMARY_ACTION);
+    }
+
+    @Override
     public void publishReports() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        executeEventSynchronously(ControlSignals.PUBLISH_REPORT_ACTION);
     }
 
     @Override
@@ -125,8 +166,6 @@ public class ChronicleQueueSource implements ReconcileController {
     public void registerReconcileReportPublisher(ReconcileReportPublisher listener) {
         executeEventSynchronously(new ListenerRegisration<>(listener, ReconcileReportPublisher.class));
     }
-    
-    
 
     public static class ChronicleQueueSourceBuilder {
 
@@ -147,17 +186,23 @@ public class ChronicleQueueSource implements ReconcileController {
         }
 
         public ChronicleQueueSourceBuilder chronicleFile(String filePath) {
-            File queuePath = new File(OS.TARGET, filePath);
+            File queuePath = new File(filePath);
+            try {
+                System.out.println("storing queue at:" + queuePath.getCanonicalPath());
+            } catch (IOException ex) {
+                Logger.getLogger(ChronicleQueueSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
             source.queue = SingleChronicleQueueBuilder.binary(queuePath).build();
-            source.methodReader = source.queue.createTailer().methodReader(new ReconcileSink() {
+            source.tailer = source.queue.createTailer();
+            source.methodReader = source.tailer.methodReader(new ReconcileSink() {
                 @Override
                 public void processTradeAcknowledgement(TradeAcknowledgement acknowledgedment) {
-                     source.eventHandler.onEvent(acknowledgedment);
+                    source.eventHandler.onEvent(acknowledgedment);
                 }
 
                 @Override
                 public void timeUpdate(TimingPulseEvent timingEvent) {
-                     source.eventHandler.onEvent(timingEvent);
+                    source.eventHandler.onEvent(timingEvent);
                 }
             });
             return this;
@@ -166,7 +211,7 @@ public class ChronicleQueueSource implements ReconcileController {
         public ChronicleQueueSource build() {
             Objects.requireNonNull(source.queue, "must specify file location for chronicle queue");
             Objects.requireNonNull(source.eventHandler, "must provide an EventHandler to process messages");
-            if(source.eventHandler instanceof Lifecycle){
+            if (source.eventHandler instanceof Lifecycle) {
                 ((Lifecycle) source.eventHandler).init();
             }
             return source;
