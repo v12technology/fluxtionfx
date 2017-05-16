@@ -63,6 +63,10 @@ public interface ReconcileController {
     void publishReports();
     
     /**
+     * notify the reconciler to publish all summary updates
+     */
+    void publishSummaryUpdate();
+    /**
      * Enable or disable the 
      * @param enable 
      */
