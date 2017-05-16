@@ -20,7 +20,6 @@ import com.fluxtion.fx.event.TimingPulseEvent;
 import com.fluxtion.fx.reconciler.ReconcileSink;
 import com.fluxtion.fx.reconciler.events.TradeAcknowledgement;
 import java.io.File;
-import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueue;
 import net.openhft.chronicle.queue.impl.single.SingleChronicleQueueBuilder;
 
@@ -33,12 +32,12 @@ public class ChronicleClient implements ReconcileSink {
 
     private final ReconcileSink chronicleSink;
 
-    public ChronicleClient(String filePath){
-        File queuePath = new File(OS.TARGET, filePath);
-        SingleChronicleQueue queue = SingleChronicleQueueBuilder.binary(queuePath).build(); 
+    public ChronicleClient(String filePath) {
+        File queuePath = new File(filePath);
+        SingleChronicleQueue queue = SingleChronicleQueueBuilder.binary(queuePath).build();
         chronicleSink = queue.acquireAppender().methodWriter(ReconcileSink.class);
     }
-    
+
     @Override
     public void processTradeAcknowledgement(TradeAcknowledgement acknowledgedment) {
         chronicleSink.processTradeAcknowledgement(acknowledgedment);
@@ -48,5 +47,5 @@ public class ChronicleClient implements ReconcileSink {
     public void timeUpdate(TimingPulseEvent timingEvent) {
         chronicleSink.timeUpdate(timingEvent);
     }
-    
+
 }
